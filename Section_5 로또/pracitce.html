@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .ball {
+      display: inline-block;
+      border: 1px solid black;
+      border-radius: 20px;
+      width: 40px;
+      height: 40px;
+      line-height: 40px;
+      font-size: 20px;
+      text-align: center;
+      margin-right: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="result">추첨 결과는? </div>
+  <div id="bonus">보너스: </div>  
+
+  <script>
+    const candidate = Array(45).fill().map((v, i) => i + 1);
+    const shuffle = [];
+    while (candidate.length > 0) {
+      const random = Math.floor(Math.random() * candidate.length);
+      const spliceArray = candidate.splice(random, 1);
+      const value = spliceArray[0];
+      shuffle.push(value);
+    }
+    console.log(shuffle);
+    const winBalls = shuffle.slice(0, 6).sort((a, b) => a - b);
+    const bonus = shuffle[6];
+    console.log(winBalls, bonus);
+
+    const $result = document.querySelector("#result");
+
+    function color(number, $tag) {
+      if (number < 7) {
+        $tag.style.backgroundColor = 'red';
+        $tag.style.color = 'white';
+      } else if(number < 14){
+        $tag.style.backgroundColor = 'orange';
+        $tag.style.color = 'white';
+      } else if(number < 21){
+        $tag.style.backgroundColor = 'yellow';
+        $tag.style.color = 'black';
+      } else if(number < 28){
+        $tag.style.backgroundColor = 'green';
+        $tag.style.color = 'white';
+      } else if(number < 35){
+        $tag.style.backgroundColor = 'blue';
+        $tag.style.color = 'white';
+      } else if(number < 42){
+        $tag.style.backgroundColor = 'navy';
+        $tag.style.color = 'white';
+      } else {
+        $tag.style.backgroundColor = 'violet';
+        $tag.style.color = 'white';
+      }
+    }
+
+    const drawball = (number, $parent) => {
+      const $ball = document.createElement('div');
+      $ball.className = 'ball';
+      color(number, $ball);
+      $ball.textContent = number;
+      $parent.appendChild($ball);
+    };
+
+    for(let i = 0; i < winBalls.length; i++){
+      setTimeout(() => {
+        drawball(winBalls[i], $result);
+      }, (i + 1) * 2000);
+    };
+
+    const $bonus = document.querySelector('#bonus');
+    setTimeout(() => {
+      drawball(bonus, $bonus);
+    }, 14000);
+  </script>
+</body>
+</html>

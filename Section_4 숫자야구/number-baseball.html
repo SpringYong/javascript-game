@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>숫자야구</title>
+</head>
+
+<body>
+  <form id="form">
+    <input type="text" id="input"> <!-- event.target[0]으로도 접근 가능 -->
+    <button>확인</button>
+  </form>
+  <div id="logs"></div>
+  
+  <script>
+    // HTML 태그를 선택한 것을 변수로 만들때는 $로 만듬(제로초 규칙)
+    // inputTag(Tinput) 이런식으로 만드는 사람도 있다
+    const $input = document.querySelector('#input');
+    const $form = document.querySelector('#form');
+    const $logs = document.querySelector('#logs');
+
+    const numbers = []; // [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    for (let n = 0; n < 9; n += 1) {
+      numbers.push(n + 1);
+    }
+
+    const answer = [];
+    for (let n = 0; n <= 3; n += 1) { // 4번 반복
+      // const index = Math.floor(Math.random()*(9)
+      // 문제점 numbers에서 1장씩 줄어드는데 index는 0~8 이라 undefined 뽑힐 수도 있다
+      const index = Math.floor(Math.random() * (numbers.length)); // 0~8 정수
+      answer.push(numbers[index]); // 인덱스로 넣기 때문에 1작은 숫자
+      numbers.splice(index, 1); // 카드 1장 뽑는다(원래 있던거에서 -1)
+    }
+    console.log(answer);
+
+    const tries = [];
+    function checkInput(input) { // 검사하는 코드
+      if (input.length !== 4) { // 길이는 4가 아닌가 - 314 입력시 에러
+        return alert('4자리 숫자를 입력해 주세요.');
+      }
+      if (new Set(input).size !== 4) { // 중복된 숫자가 있는가 - new Set 중복을 제거한 배열 - 3411 입력시 알아서 341로 만듬
+        return alert('중복되지 않게 입력해 주세요.');
+      }
+      if (tries.includes(input)) { // 이미 시도한 값은 아닌가 - 5126, 7436, 5126 에러
+        return alert('이미 시도한 값입니다.');
+      }
+      return true;
+    }
+
+    $form.addEventListener('submit', (event) => {
+      event.preventDefault(); // 기본 동작 막기
+      const value = $input.value;
+      $input.value = ''; // 다음 값 입력을 위한 편의상 공백
+      if (!checkInput(value)) {
+        return;
+      }
+      // 입력값 문제없음
+      if (answer.join('') === value) { // [3, 1, 4, 6] -> '3146' - 배열을 문자로 바꾸는 join
+        $logs.textContent = '홈런!'; // 입력값이 답과 같으면 홈런
+        return;
+      }
+      if (tries.length >= 9) { // 기회 10번 이상시 패배
+        const message = document.createTextNode(`패배! 정답은 ${answer.join('')}`);
+        $logs.appendChild(message);
+        return;
+      }
+      // 몇 스트라이크 몇 볼인지 검사
+      let strike = 0; // 초기값 0
+      let ball = 0;
+      // answer: 3149, value: 1234
+      for (let i = 0; i < answer.length; i++) { // 0 1 2 3
+        const index = value.indexOf(answer[i]);
+        if (index > -1) { // 일치하는 숫자 발견
+          if (index === i) { // 자릿수도 같음
+            strike += 1;
+          } else { // 숫자만 같음
+            ball += 1;
+          }
+        }
+      }
+      $logs.append(`${value}: ${strike} 스트라이크 ${ball} 볼`, document.createElement('br'));
+      tries.push(value);
+    });
+  </script>
+</body>
+
+</html>
